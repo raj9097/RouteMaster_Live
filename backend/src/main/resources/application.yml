@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: routemaster-backend
+  
+  # H2 Database Configuration (In-Memory)
+  datasource:
+    url: jdbc:h2:mem:routemaster;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+  
+  # Batch Configuration
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # Prevent auto-run on startup
+  
+  # Security
+  security:
+    user:
+      name: admin
+      password: admin123
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Management/Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Application Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:routemaster-super-secret-key-change-in-production-2026}
+    expiration: 86400000  # 24 hours in milliseconds
+  
+  websocket:
+    allowed-origins: ${WEBSOCKET_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:80}
+  
+  simulator:
+    enabled: true
+    interval: 1000  # 1 second
+    parcel-count: 100  # Number of parcels to simulate
+  
+  batch:
+    route-log-processor:
+      chunk-size: 1000
+      thread-count: 4
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.routemaster: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # MongoDB - Primary database with GeoJSON support
+  mongodb:
+    image: mongo:7.0
+    container_name: routemaster-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: routemaster2026
+      MONGO_INITDB_DATABASE: routemaster
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - routemaster-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL - Analytics database for batch processing
+  postgresql:
+    image: postgres:16-alpine
+    container_name: routemaster-postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: routemaster_analytics
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics2026
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - routemaster-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: routemaster-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_DATABASE: routemaster
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: routemaster2026
+      POSTGRES_HOST: postgresql
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: routemaster_analytics
+      POSTGRES_USERNAME: analytics
+      POSTGRES_PASSWORD: analytics2026
+      JWT_SECRET: routemaster-super-secret-key-change-in-production-2026
+      WEBSOCKET_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:80
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+    networks:
+      - routemaster-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Vue.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: routemaster-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - routemaster-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  routemaster-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  postgresql_data:

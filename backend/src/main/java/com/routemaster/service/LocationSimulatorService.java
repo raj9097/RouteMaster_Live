@@ -30,7 +30,8 @@ public class LocationSimulatorService {
     private int parcelCount;
 
     private final Random random = new Random();
-    private final Map<Long, SimulatedRoute> activeRoutes = new ConcurrentHashMap<>();
+    // Changed key from Long to String
+    private final Map<String, SimulatedRoute> activeRoutes = new ConcurrentHashMap<>();
 
     // City center coordinates (example: New Delhi, India)
     private static final double CENTER_LAT = 28.6139;
@@ -185,7 +186,7 @@ public class LocationSimulatorService {
     }
 
     public record LocationUpdate(
-            Long parcelId,
+            String parcelId,
             String trackingNumber,
             double longitude,
             double latitude,

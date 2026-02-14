@@ -21,7 +21,7 @@ public class ParcelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Parcel> getParcelById(@PathVariable Long id) {
+    public ResponseEntity<Parcel> getParcelById(@PathVariable String id) {
         return parcelService.getParcelById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -58,13 +58,13 @@ public class ParcelController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Parcel> updateParcel(@PathVariable Long id, @RequestBody Parcel parcel) {
+    public ResponseEntity<Parcel> updateParcel(@PathVariable String id, @RequestBody Parcel parcel) {
         return ResponseEntity.ok(parcelService.updateParcel(id, parcel));
     }
 
     @PatchMapping("/{id}/location")
     public ResponseEntity<Void> updateLocation(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam double longitude,
             @RequestParam double latitude) {
         parcelService.updateParcelLocation(id, longitude, latitude);
@@ -72,7 +72,7 @@ public class ParcelController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteParcel(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteParcel(@PathVariable String id) {
         parcelService.deleteParcel(id);
         return ResponseEntity.noContent().build();
     }

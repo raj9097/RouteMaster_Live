@@ -3,32 +3,27 @@ package com.routemaster.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "parcels")
-@EntityListeners(AuditingEntityListener.class)
+@Document(collection = "parcels")
 public class Parcel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(unique = true, nullable = false)
     private String trackingNumber;
 
-    @Enumerated(EnumType.STRING)
     private ParcelStatus status;
 
-    // Current location (simplified from GeoJsonPoint)
+    // Current location
     private Double currentLatitude;
     private Double currentLongitude;
 
@@ -50,7 +45,6 @@ public class Parcel {
 
     private String recipientPhone;
 
-    @Column(length = 500)
     private String recipientAddress;
 
     private Double weight; // in kg
@@ -58,7 +52,6 @@ public class Parcel {
     private String priority; // LOW, MEDIUM, HIGH, URGENT
 
     @CreatedDate
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate

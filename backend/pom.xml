@@ -41,17 +41,22 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         
-        <!-- H2 Database (In-Memory) -->
+        <!-- MongoDB -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Data JPA (Removed) -->
+        <!-- JDBC & H2 for Spring Batch (Batch requires a relational DB for metadata) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        
-        <!-- Spring Boot Data JPA (for PostgreSQL) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         
         <!-- Spring Batch -->

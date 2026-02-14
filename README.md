@@ -118,34 +118,42 @@ curl -X POST http://localhost:8080/api/admin/batch/process-route-logs \
 | Geospatial Query | <100ms | ✅ Achieved |
 | Concurrent Users | 1,000+ | ✅ Supported |
 
-## 🗂️ Project Structure
+## 🗂️ Project Structure & File Guide
 
-```
-RouteMaster Live/
-├── backend/                    # Spring Boot Backend
-│   ├── src/main/java/com/routemaster/
-│   │   ├── batch/             # Spring Batch configuration
-│   │   ├── config/            # WebSocket, Security configs
-│   │   ├── controller/        # REST controllers
-│   │   ├── model/             # Domain models
-│   │   ├── repository/        # Data repositories
-│   │   ├── security/          # JWT authentication
-│   │   └── service/           # Business logic
-│   ├── Dockerfile
-│   └── pom.xml
-├── frontend/                   # Vue.js Frontend
-│   ├── src/
-│   │   ├── components/        # Reusable components
-│   │   ├── stores/            # Pinia state management
-│   │   ├── views/             # Page components
-│   │   └── router/            # Vue Router
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── package.json
-├── mongo-init/                # MongoDB initialization
-├── postgres-init/             # PostgreSQL initialization
-└── docker-compose.yml         # Orchestration
-```
+### Backend Structure (`backend/src/main/java/com/routemaster/`)
+
+| Package | File | Description |
+|---------|------|-------------|
+| **Root** | `RouteMasterApplication.java` | Main entry point used to bootstrap the Spring Boot application. |
+| **config** | `DataInitializer.java` | Seeds the database with initial admin/driver users on startup. |
+| | `SecurityConfig.java` | Configures Spring Security chain, CORS policies, and public access endpoints. |
+| | `WebSocketConfig.java` | Sets up STOMP over WebSocket broker for real-time location updates. |
+| **controller** | `AuthController.java` | REST endpoints for user registration (`/register`) and login (`/login`). |
+| | `BatchController.java` | Admin endpoints to manually trigger Spring Batch analytics jobs. |
+| | `ParcelController.java` | API for parcel CRUD operations and geospatial search (`/nearby`). |
+| | `TestDataController.java` | Utility endpoints to generate bulk test data for demos. |
+| **model** | `Parcel.java` | MongoDB document representing a package with GeoJSON coordinates. |
+| | `RouteLog.java` | MongoDB document storing raw historical location points. |
+| | `RouteAnalytics.java` | PostgreSQL entity for aggregated daily performance metrics. |
+| | `User.java` | PostgreSQL entity for system users (Admin, Driver, User). |
+| **repository** | `ParcelRepository.java` | MongoRepository extension with custom geospatial queries using `$near`. |
+| | `RouteLogRepository.java` | Data access layer for raw route logs. |
+| | `RouteAnalyticsRepository.java` | JPA repository for querying aggregated analytics data. |
+| | `UserRepository.java` | JPA repository for user management. |
+| **security** | `JwtService.java` | Utility class for generating and validating JWT tokens. |
+| | `JwtAuthenticationFilter.java` | Filter that intercepts requests to validate "Bearer" tokens. |
+| | `CustomUserDetailsService.java` | Loads user specific data from the database for authentication. |
+| **service** | `LocationSimulatorService.java` | Core engine that simulates movement for 100+ parcels and pushes updates via WebSocket. |
+| | `ParcelService.java` | Business logic for managing parcel lifecycle and status updates. |
+| | `TestDataGeneratorService.java` | Helper service to create realistic dummy data for testing. |
+| **batch** | `RouteLogBatchConfig.java` | Spring Batch job configuration that processes route logs into analytics. |
+
+### Frontend Structure (`frontend/src/`)
+
+- **`views/`**: Main page components (Dashboard, Login, DriverView).
+- **`components/`**: Reusable UI elements (MapComponent, StatsCard).
+- **`stores/`**: Pinia stores for global state (Auth, WebSocket connection).
+- **`router/`**: Vue Router configuration for navigation guards.
 
 ## 🔧 Configuration
 

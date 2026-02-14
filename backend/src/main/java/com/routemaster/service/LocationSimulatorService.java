@@ -26,7 +26,7 @@ public class LocationSimulatorService {
     @Value("${app.simulator.enabled:true}")
     private boolean simulatorEnabled;
 
-    @Value("${app.simulator.parcel-count:100}")
+    @Value("${app.simulator.parcel-count:20}")
     private int parcelCount;
 
     private final Random random = new Random();
